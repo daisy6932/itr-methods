@@ -94,7 +94,7 @@ def make_anchor(n_features, n_actions, *, hidden1=192, hidden2=96,
     """Construct the paper's outcome-network architecture on CPU."""
     if n_features < 1 or n_actions < 2:
         raise ValueError("Need at least one feature and two treatments")
-    with _random_state(seed):
+    with _LOCK, _random_state(seed):
         return Net(n_features, n_actions, hidden1, hidden2, dropout,
                    use_baseline=True, n_hidden_layers=n_hidden_layers)
 
@@ -126,7 +126,7 @@ def train_anchor(model, X, A, y, X_val, A_val, y_val, *, config=None, log_fn=Non
     return model
 
 
-class NSCF:
+class _Discovery:
     """Explicit treatment partition discovery in a shared neural outcome model.
 
     Fit accepts no test outcomes or true groups. Larger predicted outcome is

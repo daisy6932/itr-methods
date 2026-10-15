@@ -3,3 +3,5 @@ numpy==2.2.5
 torch==2.7.0
 scipy==1.15.3
 matplotlib==3.10.8
+# New estimator API dependency (not part of the frozen paper environment).
+scikit-learn==1.7.2

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nscf-itr-method"
-version = "0.1.0"
+version = "0.2.0"
 description = "Neural supervised treatment clustering for individualized treatment rules"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -14,6 +14,7 @@ dependencies = [
   "torch>=2.7,<3",
   "scipy>=1.12,<1.16",
   "matplotlib>=3.8,<3.11",
+  "scikit-learn>=1.6,<2",
 ]
 
 [project.urls]

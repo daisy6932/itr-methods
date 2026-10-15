@@ -2,7 +2,7 @@
 
 **Learning explicit treatment-sharing structure inside a neural outcome model.**
 
-[Paper](https://arxiv.org/abs/2610.19104) · [Method notes](docs/METHOD.md) · [Validation](docs/VALIDATION.md) · [Authorship and permissions](AUTHORS.md)
+[Paper](https://arxiv.org/abs/2610.19104) · [Quick start](docs/QUICKSTART.md) · [API](docs/API.md) · [Method notes](docs/METHOD.md) · [Validation](docs/VALIDATION.md)
 
 Implementation and maintenance: **Daixi Huang**.
 
@@ -26,7 +26,9 @@ Included:
 - Shared neural outcome model and L1 fusion/discovery kernels.
 - Exact coordinatewise isotonic Z update with the original row-snapping rule.
 - Grouped neural refitting and validation-based model selection.
-- A small Python interface, synthetic example, diagnostic figure, and tests.
+- A scikit-learn-style estimator with automatic anchor training, treatment-label
+  mapping, training-only standardization, and retained advanced anchor input.
+- Runnable examples, interpretation tutorials, and software regression tests.
 
 Not included: SCAF implementation, other benchmark implementations, raw PDX
 data, saved research checkpoints, server logs, or the complete experimental
@@ -48,9 +50,43 @@ python -m pip install --no-deps -e .
 python -m unittest discover -s tests -v
 ```
 
-No R installation, external dataset, or cluster account is needed.
+No R installation, external dataset, or cluster account is needed. This private
+development version is **not published on PyPI or TestPyPI**. Do not use
+`pip install nscf-itr-method` expecting a public distribution.
 
-## Run the example
+## Quick start
+
+```bash
+python examples/quickstart.py
+```
+
+```python
+from nscf import NSCF
+
+# Short execution-check settings, not recommended research training budgets.
+model = NSCF(
+    hidden_layer_sizes=(16, 8), pretrain_epochs=20,
+    max_cycles=1, num_lambdas=3, admm_epochs=3,
+    theta_steps=2, refit_epochs=10, eval_every=5,
+    random_state=42,
+)
+model.fit(X_train, y_train, treatment=A_train)
+recommendations = model.predict(X_test)         # original treatment labels
+outcomes = model.predict_outcomes(X_test)       # columns follow treatments_
+print(model.treatments_, model.group_ids_)
+```
+
+`fit` makes an internal stratified validation split unless you supply
+`validation_data=(X_val, y_val, A_val)`. Standardization is learned on the fitting
+subset only. Use `outcome_direction="minimize"` when smaller outcomes are better;
+predictions remain in the original outcome units. [Full tutorial](docs/QUICKSTART.md).
+
+The interface supports sklearn parameter management and cloning. It is a
+treatment-policy estimator, not a classifier of observed treatments: it has no
+default accuracy/R2 `score`, and general `GridSearchCV`/metadata-routing support
+is not claimed. [Explicit cross-validation example](examples/cross_validation.py).
+
+## Advanced anchor example
 
 ```bash
 python examples/synthetic.py --output runs/my_first_demo
@@ -68,9 +104,10 @@ superiority**. Its convenience anchor uses a fixed epoch cap; the full paper
 archive has its own historical, compute-budget-matched anchor construction.
 The included figure is the unselected output of the documented default example.
 
-## Use your own data
+## Advanced: supply your own anchor
 
-The main interface starts from an already trained neural outcome model:
+For exact control over the pretrained model, the original advanced entry point
+is retained:
 
 ```python
 from nscf import NSCF
@@ -86,10 +123,11 @@ predicted_outcomes = model.predict_outcomes(X_test)
 print(model.group_ids_, model.diagnostics_)
 ```
 
-Use `make_anchor` and `train_anchor` as in the example to create a standalone
-initialization. Fit accepts **no test outcomes or known treatment groups**.
-Covariate preprocessing is the caller's responsibility. The predictor is the
-selected discovery model, with **no final restart/long refit**.
+Use `make_anchor` and `train_anchor` as in the advanced example to create a
+standalone initialization. Both entry points accept **no test outcomes or known
+treatment groups**. For `fit_from_anchor`, covariate preprocessing remains the
+caller's responsibility; for ordinary `fit`, standardization is built in.
+Both return the selected discovery model, with **no final restart/long refit**.
 
 The generic interface does not implement the PDX-specific unfused treatment
 mean offsets. That application pipeline remains in the full private archive.
@@ -98,12 +136,16 @@ mean offsets. That application pipeline remains in the full private archive.
 
 | Location | Contents |
 | --- | --- |
-| `src/nscf/estimator.py` | Training/validation-only method interface |
+| `src/nscf/api.py` | Estimator, validation split, preprocessing, label mapping |
+| `src/nscf/estimator.py` | Advanced discovery adapter and anchor helpers |
 | `src/nscf/core/` | Neural network, fusion, grouped-refit, and selection kernels |
 | `src/nscf/exact_prox.py` | Complete-graph coordinate L1 proximal operator |
 | `src/nscf/defaults.json` | Retained discovery/training defaults |
-| `examples/synthetic.py` | Reproducible, small synthetic demonstration |
-| `tests/test_method.py` | Input, solver, prediction, and state-restoration tests |
+| `examples/quickstart.py` | Self-contained ordinary-fit example |
+| `examples/cross_validation.py` | Explicit fold-wise evaluation with treatment labels |
+| `examples/synthetic.py` | Reproducible advanced-anchor demonstration |
+| `tests/` | Interface, core-integrity, prediction, and regression checks |
+| `.github/workflows/tests.yml` | Private repository tests/build; no publishing steps |
 | `SOURCE_PROVENANCE.json` | File hashes and extraction provenance |
 
 ## Citation

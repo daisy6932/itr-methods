@@ -4,6 +4,7 @@ import unittest
 
 import numpy as np
 import torch
+from sklearn.exceptions import NotFittedError
 from nscf import NSCF, make_anchor, train_anchor
 from nscf.exact_prox import exact_prox
 from nscf.core import solver_alt, solver_admm
@@ -36,7 +37,7 @@ class MethodTests(unittest.TestCase):
         np.testing.assert_allclose(exact_prox(np.array([[0.], [4.]]), 3., 1.), [[2.], [2.]])
 
     def test_prediction_requires_fit(self):
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(NotFittedError):
             NSCF().predict_treatment(self.X)
 
     def test_treatment_validation(self):

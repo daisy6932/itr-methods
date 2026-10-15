@@ -2,7 +2,9 @@
 
 ## Core workflow
 
-1. Supply an unfused neural outcome model with one treatment embedding per arm.
+1. Ordinary `fit` trains an unfused neural outcome model with an explicit epoch
+   cap and validation early stopping. Advanced `fit_from_anchor` instead accepts
+   a supplied model with one treatment embedding per arm.
 2. Freeze the current covariate representation for conditional L1 fusion along
    the configured lambda grid. Use exact coordinatewise isotonic Z updates,
    followed by the retained row-snapping rule.
@@ -23,7 +25,9 @@ Eight supporting core files and the exact-prox implementation are copied
 byte-for-byte from the private paper-code snapshot. `solver_alt.py` differs only
 in allowing the post-selection oracle diagnostic to be skipped when no true
 partition is supplied. This diagnostic is downstream of predictor selection.
-The method interface, tests, and example are new packaging code.
+The method interface, tests, and examples are new packaging code. The estimator
+upgrade adds splitting, preprocessing and label handling around this unchanged
+discovery adapter; it does not modify the core fusion/refit/selection kernels.
 
 The source hashes and exact file mapping are recorded in
 `SOURCE_PROVENANCE.json`. Historical option names remain in the kernels for
@@ -49,9 +53,12 @@ for independent jobs. CPU execution is the supported mode for the exact solver.
 
 ## Interpretation
 
-Treatment labels are zero-based integers. Larger outcomes are preferred; the
-caller must choose and document any scientifically appropriate outcome
-transformation. Tied predicted outcomes select the lowest treatment index.
+Ordinary fit encodes original string or integer treatment labels; advanced
+fit_from_anchor uses zero-based integer embedding indices. Predictions retain
+the original outcome units. `outcome_direction` selects maximization or
+minimization; larger is the default. The caller must choose and document any
+scientifically appropriate outcome transformation. Tied predictions select the
+first label in the fitted treatment ordering.
 Sharing an embedding creates equal predictions for treatments in that group.
 This is a modeling assumption, not evidence of clinical equivalence.
 

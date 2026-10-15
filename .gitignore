@@ -28,3 +28,6 @@ dist/
 *.zip
 *.tar.gz
 *.bundle
+*.joblib
+*.pkl
+*.pickle
