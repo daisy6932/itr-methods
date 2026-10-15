@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "Please cite the associated research paper for the NSCF method."
+title: "NSCF-ITR: Method Implementation"
+type: software
+authors:
+  - family-names: Huang
+    given-names: Daixi
+repository-code: "https://github.com/daisy6932/nscf_itr_method"
+preferred-citation:
+  type: article
+  title: "Neural Supervised Clustering for Learning Individualized Treatment Rules with Many Treatments"
+  authors:
+    - family-names: Huang
+      given-names: Daixi
+    - family-names: Yuan
+      given-names: Yixin
+    - family-names: Dai
+      given-names: Yifan
+    - family-names: Liu
+      given-names: Yufeng
+  journal: arXiv
+  year: 2026
+  url: "https://arxiv.org/abs/2610.19104"
