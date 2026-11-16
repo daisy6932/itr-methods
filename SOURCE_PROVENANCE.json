@@ -1,84 +1,101 @@
-{
-  "extracted_on": "2026-10-15",
-  "archive_snapshot": "aa714ba556c8335673aec2d9a76569d60ee1ad1e",
-  "scope": "Source traceability only; this is not a license or complete experiment reproduction",
-  "files": [
-    {
-      "file": "src/nscf/core/audit_hooks.py",
-      "source": "engine/vendor/src/its_nn_value_first_grouped/audit_hooks.py",
-      "source_sha256": "79f2619bbe30d92be445d6a9e5fa417b505b545cfc5cb624a8c10177df25361b",
-      "sha256": "79f2619bbe30d92be445d6a9e5fa417b505b545cfc5cb624a8c10177df25361b",
-      "change": "byte-identical"
-    },
-    {
-      "file": "src/nscf/core/config.py",
-      "source": "engine/vendor/src/its_nn_value_first_grouped/config.py",
-      "source_sha256": "a71dc7114a8f77380385abf729e0c2afd8b498f95228dbae492ada68c16537c3",
-      "sha256": "a71dc7114a8f77380385abf729e0c2afd8b498f95228dbae492ada68c16537c3",
-      "change": "byte-identical"
-    },
-    {
-      "file": "src/nscf/core/fusion_solver.py",
-      "source": "engine/vendor/src/its_nn_value_first_grouped/fusion_solver.py",
-      "source_sha256": "ee54ca728eb7e7737194ec2857519ff83a22b9438a844514c37a4718bbe7dea6",
-      "sha256": "ee54ca728eb7e7737194ec2857519ff83a22b9438a844514c37a4718bbe7dea6",
-      "change": "byte-identical"
-    },
-    {
-      "file": "src/nscf/core/model.py",
-      "source": "engine/vendor/src/its_nn_value_first_grouped/model.py",
-      "source_sha256": "777e209ff89a4cb29a28186bb1154d45957f5058474677c2857d06974dddaaa9",
-      "sha256": "777e209ff89a4cb29a28186bb1154d45957f5058474677c2857d06974dddaaa9",
-      "change": "byte-identical"
-    },
-    {
-      "file": "src/nscf/core/penalty.py",
-      "source": "engine/vendor/src/its_nn_value_first_grouped/penalty.py",
-      "source_sha256": "dd5140267780f1d33b7da58d34c17092b4f4278cee6f8851c169a287e23b2f01",
-      "sha256": "dd5140267780f1d33b7da58d34c17092b4f4278cee6f8851c169a287e23b2f01",
-      "change": "byte-identical"
-    },
-    {
-      "file": "src/nscf/core/refit_selection.py",
-      "source": "engine/vendor/src/its_nn_value_first_grouped/refit_selection.py",
-      "source_sha256": "6fea90453158bed3a8ffccaf8788916c9493c0be720de2030c738c8ca4152c66",
-      "sha256": "6fea90453158bed3a8ffccaf8788916c9493c0be720de2030c738c8ca4152c66",
-      "change": "byte-identical"
-    },
-    {
-      "file": "src/nscf/core/solver_admm.py",
-      "source": "engine/vendor/src/its_nn_value_first_grouped/solver_admm.py",
-      "source_sha256": "f267e10b6b5c202b1d3408180b0cc27b3b0b69c0aeb5820b3dcd7d72631d8dda",
-      "sha256": "f267e10b6b5c202b1d3408180b0cc27b3b0b69c0aeb5820b3dcd7d72631d8dda",
-      "change": "byte-identical"
-    },
-    {
-      "file": "src/nscf/core/solver_alt.py",
-      "source": "engine/vendor/src/its_nn_value_first_grouped/solver_alt.py",
-      "source_sha256": "f768105e3f6d4a621df41a71c5b6c380008c904ea03c8ebd57f4e891293a7714",
-      "sha256": "1298817d868a971bfd3d3210f72bbee97f6039c8ba759cfda5a32c8d37ee3661",
-      "change": "post-selection oracle diagnostic optional"
-    },
-    {
-      "file": "src/nscf/core/trainer.py",
-      "source": "engine/vendor/src/its_nn_value_first_grouped/trainer.py",
-      "source_sha256": "836f9ee1584b83405b8155fdbca6d30a8dee1516558075e31a1b4c51d8338d52",
-      "sha256": "836f9ee1584b83405b8155fdbca6d30a8dee1516558075e31a1b4c51d8338d52",
-      "change": "byte-identical"
-    },
-    {
-      "file": "src/nscf/exact_prox.py",
-      "source": "engine/vendor/fusion_solver_diagnostic_v1/scripts/exact_prox.py",
-      "source_sha256": "cd24eed4cbb3a5cdb6a183560e100c364a7970115cfe75c674d9ec67680a6ad4",
-      "sha256": "cd24eed4cbb3a5cdb6a183560e100c364a7970115cfe75c674d9ec67680a6ad4",
-      "change": "byte-identical"
-    },
-    {
-      "file": "src/nscf/defaults.json",
-      "source": "engine/vendor/revision_suite_v2/template.json",
-      "source_sha256": "b8ff19b328a143dc0804c229ab593dd7ab0ceca06402cb760026d09c76ac465e",
-      "sha256": "fe59474cbf7e4f22dd0b96b8e0bae4c0ed3338d54e10d33c3053909497be801c",
-      "change": "removed dataset/benchmark metadata; disabled file tracing in standalone API"
-    }
-  ]
-}
+[
+  {
+    "origin": "NSCF method private repository",
+    "source": "src/nscf/__init__.py",
+    "destination": "src/itr_methods/_nscf/__init__.py",
+    "sha256": "a3f1292b44538fdba6ec5bd09137718b2c1f7cd7a1fea920c9c9690259d69077",
+    "release_sha256": "a8f3b4cb93420e9f00580d6bc4964407ecd166e9097c55eceb5e6517a969d318"
+  },
+  {
+    "origin": "NSCF method private repository",
+    "source": "src/nscf/api.py",
+    "destination": "src/itr_methods/_nscf/api.py",
+    "sha256": "ff493ca90e8d88096e3a4381f0e50a4fa86699fb8890490ca533bcdbc8289605",
+    "docstring_free_sha256": "6adb4da34cd4e5649b298576c6d4abd3272fe696aacddfd9dc6b27a6425b5561",
+    "release_sha256": "409ef092efcf8451b6a09898a63bca003741e7cb4455792f4a973f049beb2ead"
+  },
+  {
+    "origin": "NSCF method private repository",
+    "source": "src/nscf/core/__init__.py",
+    "destination": "src/itr_methods/_nscf/core/__init__.py",
+    "sha256": "58b6ca42eefa701960db131712f71e735b9fcee5f7a9a92b59e0b28eefd0eb1c"
+  },
+  {
+    "origin": "NSCF method private repository",
+    "source": "src/nscf/core/audit_hooks.py",
+    "destination": "src/itr_methods/_nscf/core/audit_hooks.py",
+    "sha256": "79f2619bbe30d92be445d6a9e5fa417b505b545cfc5cb624a8c10177df25361b"
+  },
+  {
+    "origin": "NSCF method private repository",
+    "source": "src/nscf/core/config.py",
+    "destination": "src/itr_methods/_nscf/core/config.py",
+    "sha256": "a71dc7114a8f77380385abf729e0c2afd8b498f95228dbae492ada68c16537c3",
+    "release_sha256": "3dc70407da98c6ca06fd292d793b107409725130c68c157e1883282c95e3d6a9"
+  },
+  {
+    "origin": "NSCF method private repository",
+    "source": "src/nscf/core/fusion_solver.py",
+    "destination": "src/itr_methods/_nscf/core/fusion_solver.py",
+    "sha256": "ee54ca728eb7e7737194ec2857519ff83a22b9438a844514c37a4718bbe7dea6"
+  },
+  {
+    "origin": "NSCF method private repository",
+    "source": "src/nscf/core/model.py",
+    "destination": "src/itr_methods/_nscf/core/model.py",
+    "sha256": "777e209ff89a4cb29a28186bb1154d45957f5058474677c2857d06974dddaaa9"
+  },
+  {
+    "origin": "NSCF method private repository",
+    "source": "src/nscf/core/penalty.py",
+    "destination": "src/itr_methods/_nscf/core/penalty.py",
+    "sha256": "dd5140267780f1d33b7da58d34c17092b4f4278cee6f8851c169a287e23b2f01",
+    "release_sha256": "edf70db53b1f78d5cf639b9b0c96a268689834dc9d671736a6800b85bc2bdd16"
+  },
+  {
+    "origin": "NSCF method private repository",
+    "source": "src/nscf/core/refit_selection.py",
+    "destination": "src/itr_methods/_nscf/core/refit_selection.py",
+    "sha256": "6fea90453158bed3a8ffccaf8788916c9493c0be720de2030c738c8ca4152c66",
+    "release_sha256": "49986dd0e9bc1d1726b7a8cac26ab3d8f76e658b99c67e65a06813eaff6b39e3"
+  },
+  {
+    "origin": "NSCF method private repository",
+    "source": "src/nscf/core/solver_admm.py",
+    "destination": "src/itr_methods/_nscf/core/solver_admm.py",
+    "sha256": "f267e10b6b5c202b1d3408180b0cc27b3b0b69c0aeb5820b3dcd7d72631d8dda"
+  },
+  {
+    "origin": "NSCF method private repository",
+    "source": "src/nscf/core/solver_alt.py",
+    "destination": "src/itr_methods/_nscf/core/solver_alt.py",
+    "sha256": "1298817d868a971bfd3d3210f72bbee97f6039c8ba759cfda5a32c8d37ee3661",
+    "release_sha256": "2389161dece78e091124ea8fa9ea2b1edb2f167305d08c758ac0d92c427ca089"
+  },
+  {
+    "origin": "NSCF method private repository",
+    "source": "src/nscf/core/trainer.py",
+    "destination": "src/itr_methods/_nscf/core/trainer.py",
+    "sha256": "836f9ee1584b83405b8155fdbca6d30a8dee1516558075e31a1b4c51d8338d52"
+  },
+  {
+    "origin": "NSCF method private repository",
+    "source": "src/nscf/defaults.json",
+    "destination": "src/itr_methods/_nscf/defaults.json",
+    "sha256": "fe59474cbf7e4f22dd0b96b8e0bae4c0ed3338d54e10d33c3053909497be801c"
+  },
+  {
+    "origin": "NSCF method private repository",
+    "source": "src/nscf/estimator.py",
+    "destination": "src/itr_methods/_nscf/estimator.py",
+    "sha256": "9f9083010d7b9a744170d74cc234b60798c1117590d6b0077016a11a42b6254d",
+    "docstring_free_sha256": "7a555c7f21752d3da5635d3e404d82cecdaeefe803c9d88a1440b662f7987519",
+    "release_sha256": "ef9491a19d9982b3d75d408edd121b6d431814583f283c267087f9f0b7e21e4a"
+  },
+  {
+    "origin": "NSCF method private repository",
+    "source": "src/nscf/exact_prox.py",
+    "destination": "src/itr_methods/_nscf/exact_prox.py",
+    "sha256": "cd24eed4cbb3a5cdb6a183560e100c364a7970115cfe75c674d9ec67680a6ad4"
+  }
+]

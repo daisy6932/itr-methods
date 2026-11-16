@@ -1,0 +1,17 @@
+ITR Methods attribution
+
+SCAF
+Haixu Ma, Donglin Zeng, and Yufeng Liu (2022).
+Learning Individualized Treatment Rules with Many Treatments: A Supervised
+Clustering Approach Using Adaptive Fusion. NeurIPS 35, 15956–15969.
+This package implements the squared-loss SCAF method in Python. Its numerical
+solver is a new implementation. The original R and C++ sources are archived
+separately from the distribution.
+
+NSCF
+Daixi Huang, Yixin Yuan, Yifan Dai, and Yufeng Liu (2026).
+Neural Supervised Clustering for Learning Individualized Treatment Rules with
+Many Treatments. arXiv:2610.19104.
+The NSCF implementation is from the private NSCF project.
+
+This private distribution does not grant a public redistribution license.

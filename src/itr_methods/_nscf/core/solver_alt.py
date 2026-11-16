@@ -2,7 +2,6 @@ import copy
 from . import audit_hooks
 import os
 
-import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
@@ -141,6 +140,8 @@ def _enumerate_two_group_merges(group_ids):
 
 
 def plot_pretrain_and_cycles(pretrain_val, all_cycles, outdir):
+    import matplotlib.pyplot as plt
+
     xs = [0] + [int(c["cycle"]) for c in all_cycles]
     ys = [float(pretrain_val)] + [float(c["cycle_val_mse"]) for c in all_cycles]
 
@@ -609,7 +610,7 @@ def run_alternating(
             dedup_partitions=dedup_partitions,
             model_n_actions_key="n_treatments",
             baseline_mse=anchor_val,
-            verbose=True,
+            log_fn=log_fn,
         )
 
         forced_lambda_index = int(getattr(args, "force_refit_lambda_index", -1))

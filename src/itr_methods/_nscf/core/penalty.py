@@ -75,7 +75,7 @@ def fusion_penalty_elementwise_scad(
 
     pen_elem = torch.where(t <= lam, part1, torch.where(t <= a * lam, part2, part3))
 
-    # 数值稳定：极少数情况下 part2 会因为浮点误差出现 아주小负数
+    # Floating-point roundoff can leave part2 slightly negative.
     pen_elem = torch.clamp(pen_elem, min=0.0)
 
     pen = pen_elem.sum()

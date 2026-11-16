@@ -29,7 +29,12 @@ _LOCK = threading.RLock()
 def _arguments(config=None):
     args = add_args(argparse.ArgumentParser()).parse_args([])
     values = json.loads(Path(__file__).with_name("defaults.json").read_text())
-    values.update(config or {})
+    supplied = config or {}
+    unknown = supplied.keys() - (values.keys() | vars(args).keys())
+    if unknown:
+        keys = ", ".join(sorted(map(repr, unknown)))
+        raise ValueError(f"Unknown NSCF config key(s): {keys}")
+    values.update(supplied)
     for key, value in values.items():
         setattr(args, key, value)
     if args.penalty != "l1":
@@ -91,7 +96,28 @@ def _architecture(args, model):
 
 def make_anchor(n_features, n_actions, *, hidden1=192, hidden2=96,
                 dropout=0.1, n_hidden_layers=2, seed=123):
-    """Construct the paper's outcome-network architecture on CPU."""
+    """Construct an unfused NSCF outcome network on CPU.
+
+    Parameters
+    ----------
+    n_features : int
+        Number of input covariates.
+    n_actions : int
+        Number of treatments, at least two.
+    hidden1, hidden2 : int, optional
+        Hidden layer widths, defaulting to 192 and 96 respectively.
+    dropout : float, default=0.1
+        Dropout probability.
+    n_hidden_layers : int, default=2
+        Number of hidden layers, either one or two.
+    seed : int, default=123
+        Random seed for network initialization.
+
+    Returns
+    -------
+    Net
+        An unfused NSCF outcome model with initialized weights.
+    """
     if n_features < 1 or n_actions < 2:
         raise ValueError("Need at least one feature and two treatments")
     with _LOCK, _random_state(seed):
@@ -100,12 +126,27 @@ def make_anchor(n_features, n_actions, *, hidden1=192, hidden2=96,
 
 
 def train_anchor(model, X, A, y, X_val, A_val, y_val, *, config=None, log_fn=None):
-    """Train an unfused initialization using train/validation data only.
+    """Train a copy of an unfused NSCF outcome network.
 
-    Returns a new model. This convenience trainer uses the explicitly supplied
-    epoch cap, not the archive's historical original-NSCF-derived step budget.
-    It is sufficient for examples; a separately trained anchor can be supplied
-    directly to NSCF.fit_from_anchor instead.
+    Parameters
+    ----------
+    model : Net
+        Network created by make_anchor or an equivalent NSCF architecture.
+    X, X_val : array-like of shape (n_samples, n_features)
+        Training and validation covariates in the desired feature space.
+    A, A_val : array-like of shape (n_samples,)
+        Zero-based treatment indices in the model's embedding order.
+    y, y_val : array-like of shape (n_samples,)
+        Observed outcomes for training and validation.
+    config : mapping or None, default=None
+        Discovery settings, including train_epochs and optimizer options.
+    log_fn : callable or None, default=None
+        Optional callback accepting the training routine's log arguments.
+
+    Returns
+    -------
+    Net
+        Trained copy of model in evaluation mode.
     """
     if not isinstance(model, Net):
         raise TypeError("Use an NSCF Net anchor")
@@ -199,6 +240,17 @@ class _Discovery:
         }
         if not np.isfinite(score):
             raise RuntimeError("Discovery produced a nonfinite validation score")
+        selected_cycle = (structure if source == "structure_best"
+                          else result["cycles"][result["best_cycle_id"] - 1])
+        rows = selected_cycle["refit_results"]
+        self.fusion_path_ = {
+            "cycle": int(selected_cycle["cycle"]),
+            "selected_index": int(selected_cycle["picked_lambda_index"]),
+            "selected_lambda": float(selected_cycle["picked_lambda_value"]),
+            "fusion_lambdas": np.asarray([row["lambda"] for row in rows]),
+            "group_ids": np.stack([row["group_ids"] for row in rows]),
+            "validation_mse": np.asarray([row["refit_val_mse"] for row in rows], dtype=float),
+        }
         return self
 
     def predict_outcomes(self, X):

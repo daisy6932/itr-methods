@@ -5,9 +5,9 @@ import unittest
 import numpy as np
 import torch
 from sklearn.exceptions import NotFittedError
-from nscf import NSCF, make_anchor, train_anchor
-from nscf.exact_prox import exact_prox
-from nscf.core import solver_alt, solver_admm
+from itr_methods._nscf import NSCF, make_anchor, train_anchor
+from itr_methods._nscf.exact_prox import exact_prox
+from itr_methods._nscf.core import solver_alt, solver_admm
 
 
 def state_hash(model):

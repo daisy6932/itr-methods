@@ -3,26 +3,40 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "nscf-itr-method"
-version = "0.2.0"
-description = "Neural supervised treatment clustering for individualized treatment rules"
+name = "itr-methods-private"
+version = "0.2.37"
+description = "Python estimators for supervised clustering of treatment policies"
 readme = "README.md"
 requires-python = ">=3.10"
-maintainers = [{name = "Daixi Huang"}]
-dependencies = [
-  "numpy>=1.26,<3",
-  "torch>=2.7,<3",
-  "scipy>=1.12,<1.16",
-  "matplotlib>=3.8,<3.11",
-  "scikit-learn>=1.6,<2",
-]
+classifiers = ["Private :: Do Not Upload"]
+dependencies = ["numpy>=1.26", "scipy>=1.12", "scikit-learn>=1.6"]
 
 [project.urls]
-Paper = "https://arxiv.org/abs/2610.19104"
-Repository = "https://github.com/daisy6932/nscf_itr_method"
+Repository = "https://github.com/daisy6932/itr-methods"
+Issues = "https://github.com/daisy6932/itr-methods/issues"
+
+[project.optional-dependencies]
+nscf = ["torch>=2.7"]
+plot = ["matplotlib>=3.8"]
+test = ["joblib>=1.3"]
+
+[project.scripts]
+itr-doctor = "itr_methods.doctor:main"
+
+[tool.setuptools]
+include-package-data = false
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
-nscf = ["defaults.json"]
+"itr_methods._nscf" = ["defaults.json"]
+
+[tool.setuptools.data-files]
+"share/itr_methods_private" = ["README.md"]
+"share/itr_methods_private/docs" = ["docs/NSCF_TUTORIAL.ipynb", "docs/SCAF_TUTORIAL.ipynb"]
+"share/itr_methods_private/examples" = [
+    "examples/quickstart.py",
+    "examples/scaf_path_figure.py",
+    "examples/nscf_dendrogram_figure.py",
+]

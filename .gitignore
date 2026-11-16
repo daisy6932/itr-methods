@@ -31,3 +31,7 @@ dist/
 *.joblib
 *.pkl
 *.pickle
+
+.venv*/
+.ipynb_checkpoints/
+/*-ten-treatment-*.png

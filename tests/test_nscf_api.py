@@ -1,5 +1,8 @@
 """Small software/regression checks, not statistical performance benchmarks."""
+import ast
+from contextlib import redirect_stdout
 import copy
+import io
 import json
 from pathlib import Path
 import random
@@ -13,14 +16,32 @@ from sklearn.base import clone, is_classifier, is_regressor
 from sklearn.exceptions import NotFittedError
 import torch
 
-from nscf import NSCF, make_anchor, train_anchor
-from nscf.core import audit_hooks, solver_admm, solver_alt
-from nscf.estimator import _Discovery
+from itr_methods import SCAF
+from itr_methods._nscf import NSCF, make_anchor, train_anchor
+from itr_methods._nscf.core import audit_hooks, solver_admm, solver_alt
+from itr_methods._nscf.estimator import _Discovery
 
 
 SMALL = dict(hidden_layer_sizes=(5, 3), dropout=0.0, pretrain_epochs=2,
              max_cycles=1, num_lambdas=3, admm_epochs=2, theta_steps=1,
              refit_epochs=2, patience=2, eval_every=1, random_state=7)
+
+
+def _without_docstrings(content):
+    """Remove only standalone docstring lines before checking source hashes."""
+    source = content.decode("utf-8")
+    lines = content.splitlines(keepends=True)
+    doc_lines = set()
+    for node in ast.walk(ast.parse(source)):
+        if isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+            if ast.get_docstring(node, clean=False) is not None:
+                doc = node.body[0]
+                before = lines[doc.lineno - 1][:doc.col_offset]
+                after = lines[doc.end_lineno - 1][doc.end_col_offset:]
+                if before.strip() or after.strip():
+                    raise ValueError("Integrity check requires standalone docstrings")
+                doc_lines.update(range(doc.lineno, doc.end_lineno + 1))
+    return b"".join(line for i, line in enumerate(lines, 1) if i not in doc_lines)
 
 
 class NamedArray:
@@ -70,6 +91,7 @@ class APITests(unittest.TestCase):
         self.assertIs(model.fit(self.X, self.y, treatment=self.labels), model)
         pred = model.predict_outcomes(self.X)
         self.assertEqual(pred.shape, (48, 4))
+        self.assertEqual(pred.dtype, np.dtype(np.float32))
         np.testing.assert_array_equal(model.treatments_, np.unique(self.labels))
         np.testing.assert_array_equal(model.predict(self.X), model.treatments_[pred.argmax(1)])
         np.testing.assert_array_equal(model.predict_treatment(self.X), model.predict(self.X))
@@ -77,6 +99,16 @@ class APITests(unittest.TestCase):
         self.assertEqual(model.config_["n_features"], 3)
         self.assertEqual(model.config_["n_actions"], 4)
         self.assertEqual(model.n_groups_, len(np.unique(model.group_ids_)))
+
+        path = model.fusion_path_
+        self.assertEqual(path["group_ids"].shape, (SMALL["num_lambdas"], 4))
+        self.assertEqual(path["cycle"], 1)
+        selected = path["selected_index"]
+        self.assertEqual(path["fusion_lambdas"][selected], path["selected_lambda"])
+        np.testing.assert_array_equal(path["group_ids"][selected], model.group_ids_)
+        self.assertEqual(path["validation_mse"].shape, path["fusion_lambdas"].shape)
+        self.assertTrue(np.all(np.isfinite(path["validation_mse"])))
+        self.assertEqual(path["validation_mse"][selected], model.diagnostics_["validation_mse"])
 
     def test_treatment_is_required_keyword(self):
         with self.assertRaises(TypeError):
@@ -98,11 +130,46 @@ class APITests(unittest.TestCase):
 
     def test_explicit_validation_not_used_to_fit_scaler(self):
         val_X = self.X[-12:] + 20
-        model = self.model().fit(self.X[:36], self.y[:36], treatment=self.labels[:36],
-                                validation_data=(val_X, self.y[-12:], self.labels[-12:]))
+        model = self.model(standardize_outcome=True).fit(
+            self.X[:36], self.y[:36], treatment=self.labels[:36],
+            validation_data=(val_X, self.y[-12:] + 20, self.labels[-12:]),
+        )
         np.testing.assert_allclose(model.scaler_.mean_, self.X[:36].astype(float).mean(0))
+        np.testing.assert_allclose(model.outcome_scaler_.mean_, self.y[:36].astype(float).mean())
+        np.testing.assert_allclose(model.outcome_scaler_.scale_, self.y[:36].astype(float).std())
         self.assertIsNone(model.validation_indices_)
         self.assertEqual(model.diagnostics_["validation_source"], "explicit")
+
+    def test_standardized_outcomes_are_invariant_to_unit_changes(self):
+        y = self.y.astype(float)
+        reference = self.model(standardize_outcome=True).fit(self.X, y, treatment=self.labels)
+        self.assertEqual(reference.predict_outcomes(self.X).dtype, np.dtype(np.float64))
+        self.assertEqual(reference.predict_factual(self.X, treatment=self.labels).dtype, np.dtype(np.float64))
+        np.testing.assert_allclose(reference.outcome_scaler_.mean_, y[reference.train_indices_].mean())
+        for scale, offset in ((0.01, -3), (100, 15)):
+            with self.subTest(scale=scale, offset=offset):
+                model = self.model(standardize_outcome=True).fit(
+                    self.X, scale * y + offset, treatment=self.labels,
+                )
+                np.testing.assert_array_equal(model.group_ids_, reference.group_ids_)
+                np.testing.assert_array_equal(model.predict(self.X), reference.predict(self.X))
+                np.testing.assert_allclose(model.predict_outcomes(self.X),
+                                           scale * reference.predict_outcomes(self.X) + offset)
+                np.testing.assert_allclose(model.predict_factual(self.X, treatment=self.labels),
+                                           scale * reference.predict_factual(self.X, treatment=self.labels) + offset)
+                for key in ("anchor_validation_mse", "validation_mse"):
+                    self.assertAlmostEqual(model.diagnostics_[key] / scale**2, reference.diagnostics_[key])
+                np.testing.assert_allclose(
+                    model.fusion_path_["validation_mse"] / scale**2,
+                    reference.fusion_path_["validation_mse"],
+                )
+
+    def test_standardized_constant_outcome(self):
+        model = self.model(standardize_outcome=True).fit(
+            self.X, np.full(len(self.X), 25.0), treatment=self.labels,
+        )
+        np.testing.assert_array_equal(model.outcome_scaler_.scale_, [1.0])
+        self.assertTrue(np.isfinite(model.predict_outcomes(self.X)).all())
 
     def test_full_fit_matches_manual_anchor_workflow(self):
         model = self.fitted
@@ -124,14 +191,19 @@ class APITests(unittest.TestCase):
         A = np.arange(48) % 4
         old = _Discovery(config).fit_from_anchor(anchor, self.X[:36], A[:36], self.y[:36],
                                                 self.X[-12:], A[-12:], self.y[-12:])
-        new = NSCF(config).fit_from_anchor(anchor, self.X[:36], A[:36], self.y[:36],
-                                           self.X[-12:], A[-12:], self.y[-12:])
+        new = NSCF(config, standardize_outcome=True).fit_from_anchor(
+            anchor, self.X[:36], A[:36], self.y[:36], self.X[-12:], A[-12:], self.y[-12:],
+        )
         self.assertIsNone(new.scaler_)
+        self.assertIsNone(new.outcome_scaler_)
         self.assertFalse(new.diagnostics_["standardized"])
         self.assertEqual(new.config_["hidden1"], 5)
         self.assertEqual(new.config_["hidden2"], 3)
         np.testing.assert_array_equal(new.group_ids_, old.group_ids_)
         np.testing.assert_array_equal(new.predict_outcomes(self.X), old.predict_outcomes(self.X))
+        np.testing.assert_array_equal(
+            new.fusion_path_["validation_mse"], old.fusion_path_["validation_mse"],
+        )
 
     def test_numeric_noncontiguous_labels(self):
         A = np.asarray([-10, 30, 100, 500])[np.arange(48) % 4]
@@ -257,6 +329,7 @@ class APITests(unittest.TestCase):
                    dict(random_state=2**32), dict(random_state=np.random.RandomState(1)),
                    dict(validation_fraction=0), dict(validation_fraction=True),
                    dict(outcome_direction="invalid"), dict(standardize="yes"),
+                   dict(standardize_outcome="yes"),
                    dict(learning_rate=-1), dict(weight_decay=-1), dict(config="invalid")]
         for change in changes:
             with self.subTest(change=change), self.assertRaises(ValueError):
@@ -269,11 +342,26 @@ class APITests(unittest.TestCase):
             self.model(validation_fraction=0.01).fit(self.X, self.y, treatment=self.labels)
 
     def test_invalid_explicit_validation(self):
-        invalid = [(self.X, self.y), (self.X[:, :2], self.y, self.labels),
-                   (self.X, self.y, ["unknown"] * 48), (self.X, self.labels, self.y)]
-        for validation in invalid:
-            with self.assertRaises(ValueError):
+        prefix = r"^Invalid validation_data \(expected \(X_val, y_val, treatment_val\)\)"
+        invalid = [
+            ((self.X, self.y), ""),
+            ((self.y, self.X, self.labels), ": Expected 2D array"),
+            ((self.X[:, :2], self.y, self.labels), ": Validation features must match"),
+            ((self.X, self.y, ["Z"] * len(self.X)), ": Unknown treatment label: .*'Z'"),
+            ((self.X, np.full_like(self.y, np.nan), self.labels), ": Input contains NaN"),
+            ((self.X, self.y[:-1], self.labels), ": y must be .*aligned with X"),
+            ((self.X, self.y, self.y > 0), ": .*boolean labels are unsupported"),
+        ]
+        for validation, reason in invalid:
+            with self.subTest(reason=reason), self.assertRaisesRegex(ValueError, prefix + reason):
                 self.model().fit(self.X, self.y, treatment=self.labels, validation_data=validation)
+
+    def test_swapped_validation_outcomes_and_treatments_report_order(self):
+        expected_order = r"Invalid validation_data \(expected \(X_val, y_val, treatment_val\)\)"
+        for treatment in (self.labels, np.arange(len(self.X)) % 4):
+            with self.subTest(label_type=treatment.dtype), self.assertRaisesRegex(ValueError, expected_order):
+                self.model().fit(self.X, self.y, treatment=treatment,
+                                 validation_data=(self.X, treatment, self.y))
 
     def test_missing_validation_arm_warns(self):
         with self.assertWarnsRegex(UserWarning, "omits some"):
@@ -308,15 +396,53 @@ class APITests(unittest.TestCase):
         model.fit(self.X, self.y, treatment=self.labels)
         self.assertFalse(hasattr(model, "feature_names_in_"))
 
+    def test_logging_is_opt_in(self):
+        for verbose in (False, True, 0, 1):
+            with self.subTest(verbose=verbose):
+                output = io.StringIO()
+                with redirect_stdout(output):
+                    self.model(verbose=verbose).fit(self.X, self.y, treatment=self.labels)
+                if verbose:
+                    self.assertIn("[refit]", output.getvalue())
+                else:
+                    self.assertEqual(output.getvalue(), "")
+
+    def test_unknown_config_keys_are_rejected(self):
+        with self.assertRaisesRegex(ValueError, "bogus.*train_epoch"):
+            self.model(config={"train_epoch": 1, "bogus": 3}).fit(
+                self.X, self.y, treatment=self.labels,
+            )
+
+    def test_estimators_share_label_and_feature_name_rules(self):
+        for model in (self.model(), SCAF(max_updates=0)):
+            with self.subTest(estimator=type(model).__name__):
+                model.fit(NamedArray(self.X, [0, 1, 2]), self.y, treatment=self.labels)
+                self.assertFalse(hasattr(model, "feature_names_in_"))
+                with self.assertRaisesRegex(ValueError, "boolean labels"):
+                    model.fit(self.X, self.y, treatment=self.y > 0)
+                model.fit(NamedArray(self.X, ["a", "b", "c"]), self.y, treatment=self.labels)
+                with self.assertWarnsRegex(UserWarning, "no names"):
+                    model.predict(self.X[:3])
+
     def test_core_source_integrity(self):
         import hashlib
-        import nscf
+        import itr_methods._nscf as nscf
         root = Path(__file__).resolve().parents[1]
         source = Path(nscf.__file__).resolve().parent
         manifest = json.loads((root / "SOURCE_PROVENANCE.json").read_text())
-        for row in manifest["files"]:
-            path = source / Path(row["file"]).relative_to("src/nscf")
-            self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), row["sha256"], row["file"])
+        for row in manifest:
+            if row['origin'] != 'NSCF method private repository':
+                continue
+            path = source / Path(row['source']).relative_to('src/nscf')
+            content = path.read_bytes()
+            if 'release_sha256' in row:
+                expected = row['release_sha256']
+            elif 'docstring_free_sha256' in row:
+                content = _without_docstrings(content)
+                expected = row['docstring_free_sha256']
+            else:
+                expected = row['sha256']
+            self.assertEqual(hashlib.sha256(content).hexdigest(), expected, row['source'])
 
 
 if __name__ == "__main__":

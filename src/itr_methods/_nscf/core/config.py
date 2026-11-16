@@ -5,7 +5,7 @@ def add_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     # =========================================================
     # mode / output
     # =========================================================
-    # 保留 mode 只是为了兼容别处可能还在引用 args.mode
+    # Retain mode for callers that still access args.mode.
     parser.add_argument("--mode", type=str, default="alt", choices=["alt"])
     parser.add_argument("--out_base", type=str, default="outputs")
     parser.add_argument("--run_name", type=str, default="exp1")
@@ -127,7 +127,7 @@ def add_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     # =========================================================
     parser.add_argument("--alt_cycles", type=int, default=3)
 
-    # cycle 内真正 joint refit 用
+    # Settings for the joint refit within each cycle.
     parser.add_argument("--alt_refit_epochs", type=int, default=30)
     parser.add_argument("--alt_refit_lr", type=float, default=5e-4)
     parser.add_argument("--alt_refit_wd", type=float, default=1e-4)
@@ -143,7 +143,7 @@ def add_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     parser.add_argument("--num_lambda", type=int, default=30)
     parser.add_argument("--max_lambda", type=float, default=7.0)
 
-    # 这个主要给 cycle stability / cluster 可视化用
+    # Settings for cycle stability and cluster visualization.
     parser.add_argument("--round_decimals", type=int, default=2)
 
     # =========================================================
@@ -228,7 +228,7 @@ def add_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     parser.add_argument("--refit_round_decimals", type=int, default=6)
     parser.add_argument("--dedup_partitions", action="store_true", default=True)
 
-    # 给“lambda 评价阶段”的 grouped refit 用
+    # Settings for the grouped refit used to evaluate lambda candidates.
     parser.add_argument("--refit_select_epochs", type=int, default=80)
     parser.add_argument("--refit_select_lr", type=float, default=1e-3)
     parser.add_argument("--refit_select_wd", type=float, default=1e-4)

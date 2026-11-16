@@ -1,4 +1,13 @@
-# Private development changes
+# Changes
+
+## 0.2.37
+
+- Added the NumPy/SciPy SCAF estimator, automatic initializer grids, BIC and
+  CV MSE tuning, clustering paths, and fusion dendrograms.
+- Updated NSCF outcome standardization, input validation, and candidate
+  validation-MSE diagnostics.
+- Added step-by-step SCAF and NSCF notebooks and three synthetic examples.
+- Updated tests and installation instructions for the combined package.
 
 ## 0.2.0 — estimator interface
 

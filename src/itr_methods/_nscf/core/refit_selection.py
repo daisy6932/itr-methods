@@ -5,7 +5,7 @@ from __future__ import annotations
 import copy
 import csv
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 
@@ -382,6 +382,7 @@ def evaluate_lambda_path_with_refit(
     model_n_actions_key: str = "n_actions",
     baseline_mse: Optional[float] = None,
     verbose: bool = True,
+    log_fn=print,
 ) -> List[Dict[str, Any]]:
     """
     Evaluate every lambda on the path via grouped refit.
@@ -487,7 +488,7 @@ def evaluate_lambda_path_with_refit(
 
         if verbose:
             reuse_msg = f" [reused from {reused_from_idx}]" if reused_from_idx is not None else ""
-            print(
+            log_fn(
                 f"[refit] idx={i:03d}  lambda={lam:.6g}  "
                 f"groups={n_groups}  val_mse={refit_val_mse:.6f}{reuse_msg}"
             )
