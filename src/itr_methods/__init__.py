@@ -2,7 +2,7 @@
 
 from importlib.util import find_spec as _find_spec
 
-__version__ = "0.2.38"
+__version__ = "0.1.0"
 __all__ = ["SCAF"]
 if _find_spec("torch") is not None:
     __all__.append("NSCF")

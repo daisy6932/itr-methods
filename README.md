@@ -9,25 +9,34 @@ you expect nonlinear treatment effects and can spend more time on training.
 
 Use Python 3.10 or newer.
 
-### TestPyPI preview
-
-For this preview release, install the dependencies from PyPI, then install
-only ITR Methods from TestPyPI.
+For CPU-only NSCF on Linux or Windows, install PyTorch before installing
+ITR Methods with the `[nscf]` extra (see the
+[PyTorch installation guide](https://pytorch.org/get-started/locally/)).
 
 ```sh
-python -m pip install "numpy>=1.26" "scipy>=1.12" "scikit-learn>=1.6"
-python -m pip install --no-deps --only-binary=:all: --index-url https://test.pypi.org/simple/ "itr-methods==0.2.38"
+python -m pip install "torch>=2.7" --index-url https://download.pytorch.org/whl/cpu
 ```
 
-For plots, also install `matplotlib>=3.8`. To use NSCF, also install
-`torch>=2.7`; the CPU-only installation command below applies here too.
+### From PyPI
+
+Choose one of the following commands for the public release.
+
+```sh
+# SCAF with plotting
+python -m pip install "itr-methods[plot]==0.1.0"
+
+# SCAF and NSCF with plotting (includes PyTorch)
+python -m pip install "itr-methods[nscf,plot]==0.1.0"
+```
+
+Omit `[plot]` if you only need fitting and prediction.
 The installed Python interface is `itr_methods`, for example
 `from itr_methods import SCAF, NSCF` when PyTorch is available.
 
 ### From this repository
 
 The GitHub repository currently requires access. If you do not have access,
-use the TestPyPI preview or the wheel installation below. With repository
+use the PyPI or wheel installation instead. With repository
 access, clone it and install the estimators and plotting support.
 
 ```sh
@@ -40,7 +49,7 @@ python -m jupyter lab docs/SCAF_TUTORIAL.ipynb
 
 For SCAF with plotting, use `python -m pip install ".[plot]"`.
 Open `docs/NSCF_TUTORIAL.ipynb` for the nonlinear walkthrough.
-The CPU-only PyTorch command below also applies to a source installation.
+The CPU-only PyTorch command above also applies to a source installation.
 
 ### From a wheel
 
@@ -48,18 +57,10 @@ From the directory containing the wheel, choose one of the following commands.
 
 ```sh
 # SCAF with plotting
-python -m pip install "./itr_methods-0.2.38-py3-none-any.whl[plot]"
+python -m pip install "./itr_methods-0.1.0-py3-none-any.whl[plot]"
 
 # SCAF and NSCF with plotting (includes PyTorch)
-python -m pip install "./itr_methods-0.2.38-py3-none-any.whl[nscf,plot]"
-```
-
-Omit `[plot]` if you only need fitting and prediction. For CPU-only PyTorch
-on Linux or Windows, use the command below before installing the wheel with
-`[nscf]` (see the [PyTorch installation guide](https://pytorch.org/get-started/locally/)).
-
-```sh
-python -m pip install "torch>=2.7" --index-url https://download.pytorch.org/whl/cpu
+python -m pip install "./itr_methods-0.1.0-py3-none-any.whl[nscf,plot]"
 ```
 
 Run `itr-doctor --require scaf` or `itr-doctor --require nscf` to check the
