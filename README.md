@@ -9,9 +9,26 @@ you expect nonlinear treatment effects and can spend more time on training.
 
 Use Python 3.10 or newer.
 
+### TestPyPI preview
+
+For this preview release, install the dependencies from PyPI, then install
+only ITR Methods from TestPyPI.
+
+```sh
+python -m pip install "numpy>=1.26" "scipy>=1.12" "scikit-learn>=1.6"
+python -m pip install --no-deps --only-binary=:all: --index-url https://test.pypi.org/simple/ "itr-methods==0.2.38"
+```
+
+For plots, also install `matplotlib>=3.8`. To use NSCF, also install
+`torch>=2.7`; the CPU-only installation command below applies here too.
+The installed Python interface is `itr_methods`, for example
+`from itr_methods import SCAF, NSCF` when PyTorch is available.
+
 ### From this repository
 
-Clone the repository and install the estimators and plotting support.
+The GitHub repository currently requires access. If you do not have access,
+use the TestPyPI preview or the wheel installation below. With repository
+access, clone it and install the estimators and plotting support.
 
 ```sh
 git clone https://github.com/daisy6932/itr-methods.git
@@ -31,10 +48,10 @@ From the directory containing the wheel, choose one of the following commands.
 
 ```sh
 # SCAF with plotting
-python -m pip install "./itr_methods_private-0.2.38-py3-none-any.whl[plot]"
+python -m pip install "./itr_methods-0.2.38-py3-none-any.whl[plot]"
 
 # SCAF and NSCF with plotting (includes PyTorch)
-python -m pip install "./itr_methods_private-0.2.38-py3-none-any.whl[nscf,plot]"
+python -m pip install "./itr_methods-0.2.38-py3-none-any.whl[nscf,plot]"
 ```
 
 Omit `[plot]` if you only need fitting and prediction. For CPU-only PyTorch
@@ -95,7 +112,8 @@ print(dict(zip(nscf.treatments_.tolist(), nscf.group_ids_.tolist())))
 The example uses a fixed seed to illustrate the grouping output. With so
 few training rows, NSCF may leave treatments with the same underlying effect
 in separate groups. The groups can vary with the seed and the PyTorch
-environment. [Larger simulation in the NSCF tutorial](docs/NSCF_TUTORIAL.ipynb)
+environment. The bundled `docs/NSCF_TUTORIAL.ipynb` provides a larger
+simulation; the next section explains how to open it.
 
 ## Tutorials and example scripts
 
@@ -110,14 +128,14 @@ On macOS and Linux, enter the directory where the wheel installed the examples
 and notebooks, then open the SCAF tutorial.
 
 ```sh
-cd "$(python -c "from pathlib import Path; import sysconfig; print(Path(sysconfig.get_path('data')) / 'share' / 'itr_methods_private')")"
+cd "$(python -c "from pathlib import Path; import sysconfig; print(Path(sysconfig.get_path('data')) / 'share' / 'itr_methods')")"
 python -m jupyter lab docs/SCAF_TUTORIAL.ipynb
 ```
 
 In Windows PowerShell, run these commands.
 
 ```powershell
-Set-Location (python -c "from pathlib import Path; import sysconfig; print(Path(sysconfig.get_path('data')) / 'share' / 'itr_methods_private')")
+Set-Location (python -c "from pathlib import Path; import sysconfig; print(Path(sysconfig.get_path('data')) / 'share' / 'itr_methods')")
 python -m jupyter lab docs/SCAF_TUTORIAL.ipynb
 ```
 
@@ -125,16 +143,16 @@ If you installed with `pip install --user`, use the user data directory instead.
 Print the full path below and change into it.
 
 ```sh
-python -c "from pathlib import Path; import sysconfig; print(Path(sysconfig.get_path('data', scheme=sysconfig.get_preferred_scheme('user'))) / 'share' / 'itr_methods_private')"
+python -c "from pathlib import Path; import sysconfig; print(Path(sysconfig.get_path('data', scheme=sysconfig.get_preferred_scheme('user'))) / 'share' / 'itr_methods')"
 ```
 
 Select the kernel for the environment where you installed the wheel. In
 JupyterLab, use **Kernel > Restart Kernel and Run All Cells** to reproduce
 the examples.
 
-- The [SCAF tutorial](docs/SCAF_TUTORIAL.ipynb) tunes penalties, plots how
+- The `docs/SCAF_TUTORIAL.ipynb` notebook tunes penalties, plots how
   treatment groups change, and estimates policy value on held-out data.
-- The [NSCF tutorial](docs/NSCF_TUTORIAL.ipynb) compares NSCF with SCAF on a
+- The `docs/NSCF_TUTORIAL.ipynb` notebook compares NSCF with SCAF on a
   nonlinear example with ten treatments. With `[nscf,plot]` installed, open it
   using `python -m jupyter lab docs/NSCF_TUTORIAL.ipynb`.
 

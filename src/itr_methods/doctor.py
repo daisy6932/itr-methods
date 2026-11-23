@@ -15,7 +15,7 @@ def inspect():
         except metadata.PackageNotFoundError:
             packages[name] = None
     return {
-        "package": "itr-methods-private",
+        "package": "itr-methods",
         "python": platform.python_version(),
         "platform": platform.platform(),
         "python_packages": packages,

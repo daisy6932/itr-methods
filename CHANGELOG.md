@@ -2,6 +2,8 @@
 
 ## 0.2.38
 
+- Prepared the distribution name `itr-methods` for TestPyPI, including
+  installation commands, bundled-document paths, and publishing metadata.
 - Licensed the code, documentation, and examples under CC BY-NC 4.0, with
   the complete license and method attributions included in distributions.
 - Updated package metadata and removed the private-upload restriction.

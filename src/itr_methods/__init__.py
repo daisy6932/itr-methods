@@ -22,10 +22,9 @@ def __getattr__(name):
             from ._nscf import NSCF
         except ModuleNotFoundError as exc:
             if exc.name == "torch":
-                wheel = f"itr_methods_private-{__version__}-py3-none-any.whl"
                 raise ImportError(
-                    f'NSCF requires PyTorch. From the wheel directory run '
-                    f'python -m pip install "./{wheel}[nscf]".'
+                    'NSCF requires PyTorch. Install it in this Python environment '
+                    'with: python -m pip install "torch>=2.7".'
                 ) from exc
             raise
         return NSCF

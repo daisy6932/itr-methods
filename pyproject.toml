@@ -3,7 +3,7 @@ requires = ["setuptools>=77.0.3", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "itr-methods-private"
+name = "itr-methods"
 version = "0.2.38"
 description = "Python estimators for supervised clustering of treatment policies"
 readme = "README.md"
@@ -40,9 +40,9 @@ where = ["src"]
 "itr_methods._nscf" = ["defaults.json"]
 
 [tool.setuptools.data-files]
-"share/itr_methods_private" = ["README.md"]
-"share/itr_methods_private/docs" = ["docs/NSCF_TUTORIAL.ipynb", "docs/SCAF_TUTORIAL.ipynb"]
-"share/itr_methods_private/examples" = [
+"share/itr_methods" = ["README.md"]
+"share/itr_methods/docs" = ["docs/NSCF_TUTORIAL.ipynb", "docs/SCAF_TUTORIAL.ipynb"]
+"share/itr_methods/examples" = [
     "examples/quickstart.py",
     "examples/scaf_path_figure.py",
     "examples/nscf_dendrogram_figure.py",
