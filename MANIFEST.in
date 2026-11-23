@@ -1,4 +1,4 @@
-include README.md NOTICE.txt docs/NSCF_TUTORIAL.ipynb docs/SCAF_TUTORIAL.ipynb
+include LICENSE README.md NOTICE.txt docs/NSCF_TUTORIAL.ipynb docs/SCAF_TUTORIAL.ipynb
 include examples/quickstart.py
 include examples/scaf_path_figure.py examples/nscf_dendrogram_figure.py
 recursive-include tests *.py

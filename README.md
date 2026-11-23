@@ -31,10 +31,10 @@ From the directory containing the wheel, choose one of the following commands.
 
 ```sh
 # SCAF with plotting
-python -m pip install "./itr_methods_private-0.2.37-py3-none-any.whl[plot]"
+python -m pip install "./itr_methods_private-0.2.38-py3-none-any.whl[plot]"
 
 # SCAF and NSCF with plotting (includes PyTorch)
-python -m pip install "./itr_methods_private-0.2.37-py3-none-any.whl[nscf,plot]"
+python -m pip install "./itr_methods_private-0.2.38-py3-none-any.whl[nscf,plot]"
 ```
 
 Omit `[plot]` if you only need fitting and prediction. For CPU-only PyTorch
@@ -287,9 +287,16 @@ Cite the paper for the method you use.
 }
 ```
 
-## Use and contact
+## License and contact
 
-This wheel is for invited recipients' research use. Please ask before
-redistributing it. See `NOTICE.txt` in the wheel's license metadata for
-attribution details. For package questions, contact Daixi Huang at
-<daixih@umich.edu>.
+The code, documentation, and examples are licensed under
+[Creative Commons Attribution-NonCommercial 4.0 International
+(CC BY-NC 4.0)](https://creativecommons.org/licenses/by-nc/4.0/).
+You may use, modify, and share them for noncommercial purposes under the
+license's attribution and other terms. Commercial use requires separate
+permission.
+
+The full terms are in `LICENSE`; method attribution is in `NOTICE.txt`.
+Both files are included in the wheel's license metadata. The two papers and
+third-party dependencies retain their own licenses. For package questions
+or commercial licensing inquiries, contact Daixi Huang at <daixih@umich.edu>.

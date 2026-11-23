@@ -1,5 +1,12 @@
 # Changes
 
+## 0.2.38
+
+- Licensed the code, documentation, and examples under CC BY-NC 4.0, with
+  the complete license and method attributions included in distributions.
+- Updated package metadata and removed the private-upload restriction.
+- Kept estimator calculations, example code, and notebook outputs unchanged.
+
 ## 0.2.37
 
 - Added the NumPy/SciPy SCAF estimator, automatic initializer grids, BIC and

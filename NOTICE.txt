@@ -12,6 +12,13 @@ NSCF
 Daixi Huang, Yixin Yuan, Yifan Dai, and Yufeng Liu (2026).
 Neural Supervised Clustering for Learning Individualized Treatment Rules with
 Many Treatments. arXiv:2610.19104.
-The NSCF implementation is from the private NSCF project.
+The NSCF implementation is from the authors' NSCF project.
 
-This private distribution does not grant a public redistribution license.
+The code, documentation, and examples in this distribution are licensed under
+the Creative Commons Attribution-NonCommercial 4.0 International license
+(SPDX: CC-BY-NC-4.0). See LICENSE for the complete terms:
+https://creativecommons.org/licenses/by-nc/4.0/
+
+The paper references above identify the methods and their authors. This
+distribution's license does not change the licenses of the papers or of
+third-party dependencies.
