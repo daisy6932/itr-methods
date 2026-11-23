@@ -1,0 +1,16 @@
+{
+  "distribution": "itr-methods",
+  "version": "0.1.0",
+  "license": "CC-BY-NC-4.0",
+  "source_commit": "1f7c3c4c6573e0a5ceefade18de9c4dea907e453",
+  "files": {
+    "itr_methods-0.1.0-py3-none-any.whl": {
+      "bytes": 190878,
+      "sha256": "08a00c2517764544502ac59c59d2863df64aed382e8fed70639613580d20b0da"
+    },
+    "itr_methods-0.1.0.tar.gz": {
+      "bytes": 191402,
+      "sha256": "d7c5fe112abddd013d2f4a5c2b0ba388a7b7885ce79e746d13a0fe457ebb758a"
+    }
+  }
+}
